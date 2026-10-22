@@ -565,15 +565,15 @@
             <div class="flex space-x-2">
               <div class="w-24 shrink-0"> 
                 <select id="currency" class="h-10 w-full px-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white text-sm">
-                  <option value="CNY" selected>CNY (¥)</option>
-                  <option value="USD">USD ($)</option>   // 美元
-                  <option value="HKD">HKD (HK$)</option> // 港幣
-                  <option value="TWD">TWD (NT$)</option> // 新台幣
-                  <option value="JPY">JPY (¥)</option>   // 日圓
-                  <option value="EUR">EUR (€)</option>   // 歐元
-                  <option value="GBP">GBP (£)</option>   // 英鎊
-                  <option value="KRW">KRW (₩)</option>   // 韓元
-                  <option value="TRY">TRY (₺)</option>   // 土耳其里拉
+                  <option value="TWD" selected>TWD (NT$) · 新臺幣</option>
+                  <option value="CNY">CNY (¥) · 人民幣</option>
+                  <option value="USD">USD ($) · 美元</option>
+                  <option value="HKD">HKD (HK$) · 港幣</option>
+                  <option value="JPY">JPY (JP¥) · 日圓</option>
+                  <option value="EUR">EUR (€) · 歐元</option>
+                  <option value="GBP">GBP (£) · 英鎊</option>
+                  <option value="KRW">KRW (₩) · 韓元</option>
+                  <option value="TRY">TRY (₺) · 土耳其里拉
                 </select>
               </div>
               <div class="relative flex-1">
@@ -1553,7 +1553,7 @@ const lunarBiz = {
         'CNY': '¥', 'USD': '$', 'HKD': 'HK$', 'TWD': 'NT$',
         'JPY': '¥', 'EUR': '€', 'GBP': '£', 'KRW': '₩', 'TRY': '₺'
       };
-      return currencySymbols[currency] || '¥';
+      return currencySymbols[currency] || 'NT$';
     }
 
     function renderSubscriptionTable() {
@@ -1785,7 +1785,7 @@ const lunarBiz = {
           'CNY': '¥', 'USD': '$', 'HKD': 'HK$', 'TWD': 'NT$', 
           'JPY': '¥', 'EUR': '€', 'GBP': '£', 'KRW': '₩', 'TRY': '₺'
         };
-        const currencySymbol = currencySymbols[subscription.currency] || '¥';
+        const currencySymbol = currencySymbols[subscription.currency] || 'NT$';
 
         const hasAmount = subscription.amount !== null && subscription.amount !== undefined && !Number.isNaN(Number(subscription.amount));
         const amountHtml = hasAmount
@@ -2024,8 +2024,8 @@ const lunarBiz = {
           'CNY': '¥', 'USD': '$', 'HKD': 'HK$', 'TWD': 'NT$', 
           'JPY': '¥', 'EUR': '€', 'GBP': '£', 'KRW': '₩', 'TRY': '₺'
         };
-        const currency = subscription.currency || 'CNY';
-        const symbol = currencySymbols[currency] || '¥';
+        const currency = subscription.currency || 'TWD';
+        const symbol = currencySymbols[currency] || 'NT$';
         const currencyLabel = "(" + currency + " " + symbol + ")";
         
         const lunarBadge = subscription.useLunar ? 
@@ -2437,7 +2437,7 @@ const lunarBiz = {
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">付款金額 (${subscription.currency || 'CNY'} ${getCurrencySymbol(payment.currency || subscription.currency)})</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">付款金額 (${subscription.currency || 'TWD'} ${getCurrencySymbol(payment.currency || subscription.currency)})</label>
                             <input type="number" id="editPaymentAmount" value="${payment.amount}" step="0.01" min="0"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                         </div>
@@ -2486,7 +2486,7 @@ const lunarBiz = {
         const paymentData = {
             date: document.getElementById('editPaymentDate').value,
             amount: parseFloat(document.getElementById('editPaymentAmount').value) || 0,
-            currency: currentSubscription?.currency || 'CNY',
+            currency: currentSubscription?.currency || 'TWD',
             note: document.getElementById('editPaymentNote').value
         };
 
@@ -2583,7 +2583,7 @@ const lunarBiz = {
       document.body.classList.add('overflow-hidden'); // 禁止背景捲動
 
       document.getElementById('subscriptionForm').reset();
-      document.getElementById('currency').value = 'CNY'; // 預設設定為CNY
+      document.getElementById('currency').value = 'TWD'; // 預設為新臺幣
       document.getElementById('subscriptionId').value = '';
       clearFieldErrors();
 
@@ -2634,7 +2634,7 @@ const lunarBiz = {
         document.getElementById('notes').value = subscription.notes || '';
         document.getElementById('amount').value =
           subscription.amount !== null && subscription.amount !== undefined ? subscription.amount : '';
-        document.getElementById('currency').value = subscription.currency || 'CNY';
+        document.getElementById('currency').value = subscription.currency || 'TWD';
         document.getElementById('isActive').checked = subscription.isActive !== false;
         document.getElementById('autoRenew').checked = subscription.autoRenew !== false;
         document.getElementById('startDate').value = subscription.startDate
@@ -3529,7 +3529,7 @@ const lunarBiz = {
           document.getElementById('category').value = subscription.category || '';
           document.getElementById('notes').value = subscription.notes || '';
           document.getElementById('amount').value = subscription.amount !== null && subscription.amount !== undefined ? subscription.amount : '';
-          document.getElementById('currency').value = subscription.currency || 'CNY'; // 預設設定為 CNY
+          document.getElementById('currency').value = subscription.currency || 'TWD'; // 預設為新臺幣
           document.getElementById('isActive').checked = subscription.isActive !== false;
           document.getElementById('autoRenew').checked = subscription.autoRenew !== false;
           document.getElementById('startDate').value = subscription.startDate ? formatDateInputInTimezone(subscription.startDate, globalTimezone) : '';
