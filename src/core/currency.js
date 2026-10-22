@@ -17,7 +17,7 @@ const FALLBACK_RATES = {
 
 async function getDynamicRates(env) {
   const CACHE_KEY = 'SYSTEM_EXCHANGE_RATES_TWD';
-  const CACHE_TTL = 86400000; // 24小时
+  const CACHE_TTL = 86400000; // 24小時
 
   try {
     const cached = await env.SUBSCRIPTIONS_KV.get(CACHE_KEY, { type: 'json' });
@@ -139,7 +139,7 @@ function getRecentPayments(subscriptions, timezone) {
         recentPayments.push({
           name: sub.name,
           amount: payment.amount,
-          currency: sub.currency || 'CNY',
+          currency: sub.currency || 'TWD',
           customType: sub.customType,
           paymentDate: payment.date,
           note: payment.note
@@ -165,7 +165,7 @@ function getUpcomingRenewals(subscriptions, timezone) {
       return {
         name: sub.name,
         amount: sub.amount || 0,
-        currency: sub.currency || 'CNY',
+        currency: sub.currency || 'TWD',
         customType: sub.customType,
         renewalDate: sub.expiryDate,
         daysUntilRenewal
@@ -187,7 +187,7 @@ function getExpenseByType(subscriptions, timezone, rates) {
       const paymentDate = new Date(payment.date);
       const paymentParts = getTimezoneDateParts(paymentDate, timezone);
       if (paymentParts.year === currentYear) {
-        const type = sub.customType || '未分类';
+        const type = sub.customType || '未分類';
         const amountTWD = convertToTWD(payment.amount, sub.currency, rates);
         typeMap[type] = (typeMap[type] || 0) + amountTWD;
         total += amountTWD;
@@ -218,11 +218,11 @@ function getExpenseByCategory(subscriptions, timezone, rates) {
       const paymentDate = new Date(payment.date);
       const paymentParts = getTimezoneDateParts(paymentDate, timezone);
       if (paymentParts.year === currentYear) {
-        const categories = sub.category ? sub.category.split(CATEGORY_SEPARATOR_REGEX).filter(c => c.trim()) : ['未分类'];
+        const categories = sub.category ? sub.category.split(CATEGORY_SEPARATOR_REGEX).filter(c => c.trim()) : ['未分類'];
         const amountTWD = convertToTWD(payment.amount, sub.currency, rates);
 
         categories.forEach(category => {
-          const cat = category.trim() || '未分类';
+          const cat = category.trim() || '未分類';
           categoryMap[cat] = (categoryMap[cat] || 0) + amountTWD / categories.length;
         });
         total += amountTWD;
