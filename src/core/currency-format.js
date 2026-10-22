@@ -7,14 +7,14 @@
  *
  * 統一使用本模組：
  *   formatAmount(123.45, 'USD')   → '$123.45'
- *   formatAmount(123.45, 'JPY')   → 'JP¥123.45'   （JPY 与 CNY 同符号但加前缀以避免歧义）
+ *   formatAmount(123.45, 'JPY')   → 'JP¥123.45'   （JPY 與 CNY 使用相同符號，因此加上前綴避免混淆）
  *   formatAmount(null, 'USD')     → ''
  *
  */
 
 /**
  * 幣別 → 符號（前綴）對照表。
- * JPY 刻意使用 'JP¥' 前缀避免與 CNY 的 ¥ 混淆。
+ * JPY 刻意使用 'JP¥' 前綴避免與 CNY 的 ¥ 混淆。
  */
 export const CURRENCY_SYMBOLS = {
   CNY: '¥',
@@ -43,11 +43,11 @@ export function getCurrencySymbol(currency = 'TWD') {
  * 格式化金額字串；amount 為空時回傳空字串。
  *
  * @param {number|string|null|undefined} amount
- * @param {string} [currency='CNY']
+ * @param {string} [currency='TWD']
  * @param {{ withDecimal?: boolean }} [opts]
  * @returns {string}
  */
-export function formatAmount(amount, currency = 'CNY', opts = {}) {
+export function formatAmount(amount, currency = 'TWD', opts = {}) {
   if (amount === null || amount === undefined || amount === '') return '';
   const n = Number(amount);
   if (Number.isNaN(n)) return '';
