@@ -1,9 +1,9 @@
 // 注：本文件暂不启用 // @ts-check，因 lunar 库返回类型分支较多，类型清理推迟到后续 Task。
 /**
- * 订阅业务层
+ * 訂閱業務層
  *
- * 本文件负责"订阅生命周期"相关的业务规则（创建时自动推算到期日、续订生成支付记录、
- * 删除支付记录回退周期、农历周期推算、初始支付记录等）。
+ * 本檔案負責"订阅生命周期"相关的业务规则（建立時自动推算到期日、续订生成支付记录、
+ * 刪除付款紀錄回推週期、農曆週期推算、初始付款紀錄等）。
  *
  * 重构：
  * - 数据存储从单 Key 数组改为 sub:{id} 多 Key（见 subscriptions.repo.js）
@@ -218,7 +218,7 @@ async function createSubscription(subscription, env) {
         subscription.amount !== undefined && subscription.amount !== null
           ? subscription.amount
           : null,
-      currency: subscription.currency || 'CNY',
+      currency: subscription.currency || 'TWD',
       lastPaymentDate: initialPaymentDate,
       paymentHistory:
         subscription.amount !== undefined && subscription.amount !== null
@@ -227,7 +227,7 @@ async function createSubscription(subscription, env) {
                 id: Date.now().toString(),
                 date: initialPaymentDate,
                 amount: subscription.amount,
-                currency: subscription.currency || 'CNY',
+                currency: subscription.currency || 'TWD',
                 type: 'initial',
                 note: '初始订阅',
                 periodStart: normalizedStartDate || initialPaymentDate,
@@ -344,7 +344,7 @@ async function updateSubscription(id, subscription, env) {
       paymentHistory[idx] = {
         ...paymentHistory[idx],
         amount: newAmount,
-        currency: subscription.currency || existing.currency || 'CNY'
+        currency: subscription.currency || existing.currency || 'TWD'
       };
     } else if (!hasInitialPayment && newAmount !== null && newAmount !== undefined && newAmount > 0) {
       const initialDate = existing.startDate || existing.createdAt || new Date().toISOString();
@@ -352,7 +352,7 @@ async function updateSubscription(id, subscription, env) {
         id: Date.now().toString(),
         date: initialDate,
         amount: newAmount,
-        currency: subscription.currency || existing.currency || 'CNY',
+        currency: subscription.currency || existing.currency || 'TWD',
         type: 'initial',
         note: '初始订阅',
         periodStart: existing.startDate || initialDate,
@@ -388,7 +388,7 @@ async function updateSubscription(id, subscription, env) {
       reminderHours: reminderSetting.unit === 'hour' ? reminderSetting.value : undefined,
       notes: subscription.notes || '',
       amount: newAmount,
-      currency: subscription.currency || existing.currency || 'CNY',
+      currency: subscription.currency || existing.currency || 'TWD',
       lastPaymentDate:
         existing.lastPaymentDate ||
         existing.startDate ||
@@ -441,7 +441,7 @@ async function deleteSubscription(id, env) {
  * 业务规则：
  * - reset 模式：以支付日期为新开始
  * - cycle 模式：现到期日 > 支付日 时接续，否则以支付日为新开始
- * - 农历模式按农历周期推算
+ * - 农历模式按農曆週期推算
  *
  * @param {string} id
  * @param {any} env
@@ -505,7 +505,7 @@ async function manualRenewSubscription(id, env, options = {}) {
       id: Date.now().toString(),
       date: paymentDate.toISOString(),
       amount,
-      currency: subscription.currency || 'CNY',
+      currency: subscription.currency || 'TWD',
       type: 'manual',
       note,
       periodStart: newStartDate.toISOString(),
@@ -587,7 +587,7 @@ async function deletePaymentRecord(subscriptionId, paymentId, env) {
 
     return { success: true, subscription: updated, message: '支付记录已删除' };
   } catch (error) {
-    console.error('删除支付记录失败:', error);
+    console.error('刪除付款紀錄失败:', error);
     return {
       success: false,
       message: '删除失败: ' + (error && error.message ? error.message : error)
@@ -625,7 +625,7 @@ async function updatePaymentRecord(subscriptionId, paymentId, paymentData, env) 
         paymentData.currency ||
         paymentHistory[paymentIndex].currency ||
         subscription.currency ||
-        'CNY',
+        'TWD',
       note: paymentData.note !== undefined ? paymentData.note : paymentHistory[paymentIndex].note
     };
 
