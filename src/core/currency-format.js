@@ -1,11 +1,11 @@
 // @ts-check
 /**
- * 货币格式化共享工具
+ * 貨幣格式化共用工具
  *
- * 早期版本曾在不同代码路径（添加表单 / 列表 / 通知正文 / 历史 / 第三方触发）
- * 中重复定义了 currencySymbols，且偶尔默认回退 ¥（CNY 符号）造成币种与展示不一致。
+ * 早期版本曾在不同程式路徑（新增表單／清單／通知內容／歷史紀錄／第三方觸發）
+ * 重複定義 currencySymbols，偶爾預設回退至 ¥（CNY 符號），造成幣別與顯示不一致。
  *
- * 统一使用本模块：
+ * 統一使用本模組：
  *   formatAmount(123.45, 'USD')   → '$123.45'
  *   formatAmount(123.45, 'JPY')   → 'JP¥123.45'   （JPY 与 CNY 同符号但加前缀以避免歧义）
  *   formatAmount(null, 'USD')     → ''
@@ -13,8 +13,8 @@
  */
 
 /**
- * 币种 → 符号（前缀）映射。
- * JPY 故意使用 'JP¥' 前缀以避免与 CNY 的 ¥ 混淆。
+ * 幣別 → 符號（前綴）對照表。
+ * JPY 刻意使用 'JP¥' 前缀避免與 CNY 的 ¥ 混淆。
  */
 export const CURRENCY_SYMBOLS = {
   CNY: '¥',
@@ -29,18 +29,18 @@ export const CURRENCY_SYMBOLS = {
 };
 
 /**
- * 取币种符号，未知币种回退到币种代码本身。
+ * 取得幣別符號；若幣別未知，則回退為幣別代碼。
  *
- * @param {string} [currency='CNY']
+ * @param {string} [currency='TWD']
  * @returns {string}
  */
-export function getCurrencySymbol(currency = 'CNY') {
-  const code = String(currency || 'CNY').toUpperCase();
+export function getCurrencySymbol(currency = 'TWD') {
+  const code = String(currency || 'TWD').toUpperCase();
   return CURRENCY_SYMBOLS[code] || code + ' ';
 }
 
 /**
- * 格式化金额字符串，amount 为空时返回空串。
+ * 格式化金額字串；amount 為空時回傳空字串。
  *
  * @param {number|string|null|undefined} amount
  * @param {string} [currency='CNY']
