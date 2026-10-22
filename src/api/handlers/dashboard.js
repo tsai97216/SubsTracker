@@ -1,11 +1,11 @@
-// 注：dashboard 业务逻辑较多，此处不启用 // @ts-check（依赖外部 currency 模块的复杂返回类型）
+// 注：dashboard 業務邏輯较多，此处不启用 // @ts-check（依赖外部 currency 模块的复杂返回类型）
 /**
- * 仪表盘统计 handler
+ * 儀表板统计 handler
  *
  * 改动：
- * - 用户时区从 config.TIMEZONE 读取（不再硬编码 'UTC'）
- * - schedulerStatus / schedulerStatusHistory 从新的 scheduler-logs.repo 取
- *   旧 'scheduler_status' / 'scheduler_status_history' 已废弃（迁移会清掉）
+ * - 使用者時區从 config.TIMEZONE 讀取（不再硬式寫死 'UTC'）
+ * - schedulerStatus / schedulerStatusHistory 從新的 scheduler-logs.repo 取
+ *   舊 'scheduler_status' / 'scheduler_status_history' 已淘汰（遷移時會清除）
  *
  */
 import { getAllSubscriptions } from '../../data/subscriptions.js';
@@ -32,7 +32,7 @@ async function handleDashboardStats(env, config) {
     try {
       const recent = await schedulerLogsRepo.getRecent(env, 10);
       schedulerStatusHistory = recent;
-      // 兼容老前端字段：转一份扁平结构
+      // 相容舊版前端欄位：轉成扁平結構
       if (recent.length > 0) {
         const head = recent[0];
         schedulerStatus = {
@@ -53,7 +53,7 @@ async function handleDashboardStats(env, config) {
         };
       }
     } catch (error) {
-      console.error('读取调度日志失败:', error);
+      console.error('讀取排程紀錄失敗:', error);
     }
 
     const rates = await getDynamicRates(env);
@@ -89,18 +89,18 @@ async function handleDashboardStats(env, config) {
           expenseByCategory,
           schedulerStatus,
           schedulerStatusHistory,
-          /** 新增：用户时区（前端可据此显示） */
+          /** 新增：使用者時區（前端可依此顯示） */
           timezone
         }
       }),
       { headers: { 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('获取仪表盘统计失败:', error);
+    console.error('获取儀表板统计失败:', error);
     return new Response(
       JSON.stringify({
         success: false,
-        message: '获取统计数据失败: ' + (error && error.message ? error.message : error)
+        message: '取得統計資料失敗: ' + (error && error.message ? error.message : error)
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
