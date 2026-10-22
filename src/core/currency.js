@@ -2,21 +2,21 @@ import { MS_PER_DAY, getCurrentTimeInTimezone, getTimezoneDateParts } from './ti
 
 const CATEGORY_SEPARATOR_REGEX = /[\/，,\s]+/;
 
-// 汇率配置 (以 CNY 为基准，当 API 不可用或缺少特定币种如 TWD 时使用)
+// 匯率設定（以 TWD 為基準；API 不可用或缺少特定幣別時使用）
 const FALLBACK_RATES = {
-  'CNY': 1,
-  'USD': 6.98,
-  'HKD': 0.90,
-  'TWD': 0.22,
-  'JPY': 0.044,
-  'EUR': 8.16,
-  'GBP': 9.40,
-  'KRW': 0.0048,
-  'TRY': 0.16
+  'CNY': 0.22,
+  'USD': 0.031,
+  'HKD': 0.24,
+  'TWD': 1,
+  'JPY': 4.7,
+  'EUR': 0.027,
+  'GBP': 0.023,
+  'KRW': 43,
+  'TRY': 1.1
 };
 
 async function getDynamicRates(env) {
-  const CACHE_KEY = 'SYSTEM_EXCHANGE_RATES';
+  const CACHE_KEY = 'SYSTEM_EXCHANGE_RATES_TWD';
   const CACHE_TTL = 86400000; // 24小时
 
   try {
@@ -24,13 +24,13 @@ async function getDynamicRates(env) {
     if (cached && cached.ts && (Date.now() - cached.ts < CACHE_TTL)) {
       return cached.rates;
     }
-    const response = await fetch('https://api.frankfurter.dev/v1/latest?base=CNY');
+    const response = await fetch('https://api.frankfurter.dev/v1/latest?base=TWD');
     if (response.ok) {
       const data = await response.json();
       const newRates = {
         ...FALLBACK_RATES,
         ...data.rates,
-        'CNY': 1
+        'TWD': 1
       };
 
       await env.SUBSCRIPTIONS_KV.put(CACHE_KEY, JSON.stringify({
@@ -40,18 +40,18 @@ async function getDynamicRates(env) {
 
       return newRates;
     } else {
-      console.warn('[汇率] API 请求失败，使用兜底汇率');
+      console.warn('[匯率] API 請求失敗，使用備援匯率');
     }
   } catch (error) {
-    console.error('[汇率] 获取过程出错:', error);
+    console.error('[匯率] 取得匯率時發生錯誤:', error);
   }
   return FALLBACK_RATES;
 }
 
-function convertToCNY(amount, currency, rates) {
+function convertToTWD(amount, currency, rates) {
   if (!amount || amount <= 0) return 0;
-  const code = currency || 'CNY';
-  if (code === 'CNY') return amount;
+  const code = currency || 'TWD';
+  if (code === 'TWD') return amount;
   const rate = rates[code];
   if (!rate) return amount;
   return amount / rate;
@@ -71,7 +71,7 @@ function calculateMonthlyExpense(subscriptions, timezone, rates) {
       const paymentDate = new Date(payment.date);
       const paymentParts = getTimezoneDateParts(paymentDate, timezone);
       if (paymentParts.year === currentYear && paymentParts.month === currentMonth) {
-        amount += convertToCNY(payment.amount, sub.currency, rates);
+        amount += convertToTWD(payment.amount, sub.currency, rates);
       }
     });
   });
@@ -86,7 +86,7 @@ function calculateMonthlyExpense(subscriptions, timezone, rates) {
       const paymentDate = new Date(payment.date);
       const paymentParts = getTimezoneDateParts(paymentDate, timezone);
       if (paymentParts.year === lastMonthYear && paymentParts.month === lastMonth) {
-        lastMonthAmount += convertToCNY(payment.amount, sub.currency, rates);
+        lastMonthAmount += convertToTWD(payment.amount, sub.currency, rates);
       }
     });
   });
@@ -117,7 +117,7 @@ function calculateYearlyExpense(subscriptions, timezone, rates) {
       const paymentDate = new Date(payment.date);
       const paymentParts = getTimezoneDateParts(paymentDate, timezone);
       if (paymentParts.year === currentYear) {
-        amount += convertToCNY(payment.amount, sub.currency, rates);
+        amount += convertToTWD(payment.amount, sub.currency, rates);
       }
     });
   });
@@ -188,9 +188,9 @@ function getExpenseByType(subscriptions, timezone, rates) {
       const paymentParts = getTimezoneDateParts(paymentDate, timezone);
       if (paymentParts.year === currentYear) {
         const type = sub.customType || '未分类';
-        const amountCNY = convertToCNY(payment.amount, sub.currency, rates);
-        typeMap[type] = (typeMap[type] || 0) + amountCNY;
-        total += amountCNY;
+        const amountTWD = convertToTWD(payment.amount, sub.currency, rates);
+        typeMap[type] = (typeMap[type] || 0) + amountTWD;
+        total += amountTWD;
       }
     });
   });
@@ -219,13 +219,13 @@ function getExpenseByCategory(subscriptions, timezone, rates) {
       const paymentParts = getTimezoneDateParts(paymentDate, timezone);
       if (paymentParts.year === currentYear) {
         const categories = sub.category ? sub.category.split(CATEGORY_SEPARATOR_REGEX).filter(c => c.trim()) : ['未分类'];
-        const amountCNY = convertToCNY(payment.amount, sub.currency, rates);
+        const amountTWD = convertToTWD(payment.amount, sub.currency, rates);
 
         categories.forEach(category => {
           const cat = category.trim() || '未分类';
-          categoryMap[cat] = (categoryMap[cat] || 0) + amountCNY / categories.length;
+          categoryMap[cat] = (categoryMap[cat] || 0) + amountTWD / categories.length;
         });
-        total += amountCNY;
+        total += amountTWD;
       }
     });
   });
@@ -242,7 +242,7 @@ function getExpenseByCategory(subscriptions, timezone, rates) {
 export {
   FALLBACK_RATES,
   getDynamicRates,
-  convertToCNY,
+  convertToTWD,
   calculateMonthlyExpense,
   calculateYearlyExpense,
   getRecentPayments,
